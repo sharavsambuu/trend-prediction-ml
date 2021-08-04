@@ -1,2 +1,2 @@
 # trend-prediction
- Trend prediction with machinel earning
+ Trend prediction with machine learning
