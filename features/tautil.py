@@ -8,6 +8,29 @@ import pandas as pd
 import numpy as np
 import ta
 
+def ohlcv(df):
+    df.columns = [i.lower() for i in df.columns]
+    close = pd.to_numeric(df.close)
+    open = pd.to_numeric(df.open)
+    high = pd.to_numeric(df.high)
+    low = pd.to_numeric(df.low)
+    volume = pd.to_numeric(df.volume)
+    df_ohlcv = pd.DataFrame([open,high,low,close,volume]).T
+    return df_ohlcv
+
+def mom_std(df, windows_mom, windows_std):
+    mkt = df.copy()
+
+    for i in windows_mom:
+        mkt = mkt.join(df.volume.diff(i).rename('vol_mom_{}'.format(i)))
+        mkt = mkt.join(df.close.diff(i).rename('mom_{}'.format(i)))
+
+    for i in windows_std:
+        mkt = mkt.join(df.close.rolling(i).std().rename('std_{}'.format(i)))
+        mkt = mkt.join(df.volume.rolling(i).std().rename('vol_std_{}'.format(i)))
+    mkt = mkt.drop(columns=df.columns)
+    return mkt
+    
 def get_rsi(close,window=20):
     rsi = ta.momentum.rsi(close,window)
     return rsi
